@@ -19,14 +19,12 @@ import java.util.Random;
  */
 public class PigLocalGame extends LocalGame {
 
-    PigGameState pigGameState = new PigGameState();
-
-    Random random = new Random();
+    private PigGameState pigGameState;
+    Random rand = new Random();
     /**
      * This ctor creates a new game state
      */
     public PigLocalGame() {
-        //TODO  You will implement this constructor
         pigGameState = new PigGameState();
     }
 
@@ -35,11 +33,10 @@ public class PigLocalGame extends LocalGame {
      */
     @Override
     protected boolean canMove(int playerIdx) {
-        //TODO  You will implement this
-        if(playerIdx == pigGameState.getId()) {
+        if(playerIdx == pigGameState.getTurnID()){
             return true;
         }
-        else { return false;}
+        return false;
     }
 
     /**
@@ -49,61 +46,73 @@ public class PigLocalGame extends LocalGame {
      */
     @Override
     protected boolean makeMove(GameAction action) {
-        //TODO  You will implement this method
-        if (action instanceof PigHoldAction){
-            if (pigGameState.getId() == 0) {
-                pigGameState.setPlayerScore0(pigGameState.getCurrentT() + pigGameState.getPlayerScore0());
-            }
-            else if (pigGameState.getId() == 1) {
-                pigGameState.setPlayerScore1(pigGameState.getCurrentT() + pigGameState.getPlayerScore1());
-            }
-            if(players.length>0) {
-                pigGameState.setId(1);
-            }
-            changePlayer();
-            pigGameState.setCurrentT(0);
+        pigGameState.setMsg("");
 
+        if(action instanceof PigHoldAction){
+
+            if (pigGameState.getTurnID() == 0) {
+                pigGameState.setPlayer0Score(pigGameState.getRunTotal() + pigGameState.getPlayer0Score());
+            } else {
+                pigGameState.setPlayer1Score(pigGameState.getRunTotal() + pigGameState.getPlayer1Score());
+            }
+
+            pigGameState.setMsg("" + playerNames[pigGameState.getTurnID()] + " gained " + pigGameState.getRunTotal() + " points");
+
+            //change turn
+            Log.d("Testing","switch");
+            if(players.length > 1){
+                if(pigGameState.getTurnID() == 0) {
+                    pigGameState.setTurnID(1);
+                } else {
+                    pigGameState.setTurnID(0);
+                }
+            }
+
+            //reset run total
+            pigGameState.setRunTotal(0);
+            return true;
+
+        } else if(action instanceof PigRollAction){
+            //roll dice
+            pigGameState.setCurrVal(rand.nextInt(6) + 1);
+
+            //if 1 reset and switch turn
+            if(pigGameState.getCurrVal() == 1){
+                pigGameState.setMsg("" + playerNames[pigGameState.getTurnID()] + " lost all their points :(");
+                pigGameState.setRunTotal(0);
+
+                //toggle
+                //Log.d("Testing","switch");
+                if(players.length > 1){
+                    if(pigGameState.getTurnID() == 0){
+                        pigGameState.setTurnID(1);
+                    } else {
+                        pigGameState.setTurnID(0);
+                    }
+                }
+
+                pigGameState.setRunTotal(0);
+                return true;
+            }
+
+            pigGameState.setRunTotal(pigGameState.getRunTotal() + pigGameState.getCurrVal());
             return true;
         }
-        if (action instanceof PigRollAction) {
-            pigGameState.setCurrentV(random.nextInt(6)+1);
-            if (pigGameState.getCurrentV() == 1) {
-                pigGameState.setMsg(""+playerNames[pigGameState.getId()]+ " lost all their points : (")
-                pigGameState.setCurrentT(0);
-               changePlayer();
-                pigGameState.setCurrentT(0);
-            }
-            else {
-                pigGameState.setId(pigGameState.getCurrentV() + pigGameState.getCurrentT());
-            }
-            return true;
-        }
+
         return false;
     }//makeMove
-
-    public void changePlayer() {
-        if (players.length == 1) {
-        }
-        else if (players.length == 2) {
-            if (pigGameState.getId() == 0) {
-                pigGameState.setId(1);
-            }
-            if (players.length == 1){
-                pigGameState.setId(0);
-            }
-        }
-    }
 
     /**
      * send the updated state to a given player
      */
     @Override
     protected void sendUpdatedStateTo(GamePlayer p) {
-        //TODO  You will implement this method
-        PigGameState pgs = new PigGameState();
 
-        p.sendInfo(pgs);
-    }//sendUpdatedSate
+        PigGameState copy = new PigGameState();
+        copy.copyState(pigGameState);
+        p.sendInfo(copy);
+
+    }//sendUpdatedState
 
     /**
      * Check if the game is over
@@ -115,13 +124,11 @@ public class PigLocalGame extends LocalGame {
     @Override
     protected String checkIfGameOver() {
         //TODO  You will implement this method
-
-        if (pigGameState.getPlayerScore0() >= 50) {
-                return "Player 1 won with a score " + pigGameState.getPlayerScore0();
-        } else if (pigGameState.getPlayerScore1() >= 50) {
-            return "Player 2 won with a score " + pigGameState.getPlayerScore1();
+        if(pigGameState.getPlayer0Score() >= 50){
+            return " " + playerNames[0] + " wins: " + pigGameState.getPlayer0Score();
+        } else if(pigGameState.getPlayer1Score() >= 50){
+            return " " + playerNames[1] + " wins: " + pigGameState.getPlayer1Score();
         }
-
         return null;
     }
 

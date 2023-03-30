@@ -2,69 +2,69 @@ package edu.up.cs301.pig;
 
 import edu.up.cs301.game.infoMsg.GameState;
 
-public class PigGameState extends GameState {
-    private int id = 0;
-    private int playerScore0;
-    private int playerScore1;
-    private int currentT;
-    private int currentV;
+public class PigGameState extends GameState { private int turnID;
+    private int player0Score;
+    private int player1Score;
+    private int runTotal;
+    private int currVal;
+    private String msg;
 
-    public PigGameState (){
-        int id = 0;
-        int playerScore0 = 0;
-        int playerScore1 = 0;
-        int currentT = 0;
-      int currentV =0;
-
+    public PigGameState(){
+        turnID = 0;
+        player0Score = player1Score = 0;
+        runTotal = 0;
+        currVal = 0;
+        msg = "";
     }
 
-    public PigGameState(PigGameState pgs) {
-        this.id = pgs.getId();
-        this.currentT = pgs.getCurrentT();
-        this.playerScore1 = pgs.getPlayerScore1();
-        this.playerScore0 = pgs.getPlayerScore0();
-        this.currentV = pgs.getCurrentV();
+    void copyState(PigGameState toCopy){
 
+        turnID = toCopy.turnID;
+        player0Score = toCopy.player0Score;
+        player1Score = toCopy.player1Score;
+        runTotal = toCopy.runTotal;
+        currVal = toCopy.currVal;
+        msg = toCopy.msg;
+    }
+
+    int getTurnID(){
+        return turnID;
+    }
+
+    int getPlayer0Score(){
+        return player0Score;
+    }
+    int getPlayer1Score(){
+        return player1Score;
+    }
+
+    int getRunTotal(){
+        return runTotal;
+    }
+
+    int getCurrVal(){
+        return currVal;
+    }
+
+    void setTurnID(int x){
+        turnID = x;
     }
 
 
-    public int getId() {
-        return id;
+    void setPlayer0Score(int score){
+        player0Score = score;
+    }
+    void setPlayer1Score(int score){
+        player1Score = score;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    void setRunTotal(int x){
+        runTotal = x;
     }
 
-    public int getPlayerScore0() {
-        return playerScore0;
+    void setCurrVal(int x){
+        currVal = x;
     }
-
-    public void setPlayerScore0(int playerScore0) {
-        this.playerScore0 = playerScore0;
-    }
-
-    public int getPlayerScore1() {
-        return playerScore1;
-    }
-
-    public void setPlayerScore1(int playerScore1) {
-        this.playerScore1 = playerScore1;
-    }
-
-    public int getCurrentT() {
-        return currentT;
-    }
-
-    public void setCurrentT(int currentT) {
-        this.currentT = currentT;
-    }
-
-    public int getCurrentV() {
-        return currentV;
-    }
-
-    public void setCurrentV(int currentV) {
-        this.currentV = currentV;
-    }
+    void setMsg(String s) { msg = s; }
+    String getMsg(){ return msg; }
 }

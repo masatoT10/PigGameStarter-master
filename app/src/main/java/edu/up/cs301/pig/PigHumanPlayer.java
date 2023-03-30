@@ -1,19 +1,20 @@
 package edu.up.cs301.pig;
 
+
 import edu.up.cs301.game.GameHumanPlayer;
 import edu.up.cs301.game.GameMainActivity;
 import edu.up.cs301.game.R;
 import edu.up.cs301.game.infoMsg.GameInfo;
+import edu.up.cs301.game.GameComputerPlayer;
 
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.view.View.OnClickListener;
-
-import java.util.HashMap;
 
 /**
  * A GUI for a human to play Pig. This default version displays the GUI but is incomplete
@@ -24,7 +25,7 @@ import java.util.HashMap;
  */
 public class PigHumanPlayer extends GameHumanPlayer implements OnClickListener {
 
-	/* instance variables */
+    /* instance variables */
 
     // These variables will reference widgets that will be modified during play
     private TextView    playerScoreTextView = null;
@@ -36,19 +37,12 @@ public class PigHumanPlayer extends GameHumanPlayer implements OnClickListener {
 
     // the android activity that we are running
     private GameMainActivity myActivity;
-    HashMap<Integer,Integer>dieToFaceId = new HashMap<>();
 
     /**
      * constructor does nothing extra
      */
     public PigHumanPlayer(String name) {
         super(name);
-        dieToFaceId.put(1,R.drawable.face1);
-        dieToFaceId.put(2,R.drawable.face2);
-        dieToFaceId.put(3,R.drawable.face3);
-        dieToFaceId.put(4,R.drawable.face4);
-        dieToFaceId.put(5,R.drawable.face5);
-        dieToFaceId.put(6,R.drawable.face6);
     }
 
     /**
@@ -69,31 +63,54 @@ public class PigHumanPlayer extends GameHumanPlayer implements OnClickListener {
      */
     @Override
     public void receiveInfo(GameInfo info) {
-        //TODO You will implement this method to receive state objects from the game
-        if(!(info instanceof PigGameState)) {
-            this.flash(Color.RED, 270);
+
+        //Log.d("Testing", "RecieveInfo");
+        if(!(info instanceof PigGameState)){
+            flash(Color.RED, 100);
             return;
         }
+
         PigGameState pigGameState = (PigGameState) info;
 
-        if(0== this.playerNum) {
-            playerScoreTextView.setText((Integer.toString(pigGameState.getPlayerScore0())));
-            oppScoreTextView.setText(Integer.toString(pigGameState.getPlayerScore1()));
-        }
-        else {
-            playerScoreTextView.setText(Integer.toString(pigGameState.getPlayerScore1()));
-            oppScoreTextView.setText(Integer.toString(pigGameState.getPlayerScore0()));
-        }
-        turnTotalTextView.setText(Integer.toString(pigGameState.getCurrentT()));
-        dieImageButton.setImageResource(dieToFaceId.get(pigGameState.getCurrentV()));
+        messageTextView.setText(pigGameState.getMsg());
+        playerScoreTextView.setText("" + pigGameState.getPlayer0Score()); //Your Score
+        oppScoreTextView.setText("" + pigGameState.getPlayer1Score());
 
-        //CHECK
-        if (pigGameState.getId()==this.playerNum) {
-            dieImageButton.setBackgroundColor(Color.GREEN);
-        }
-        else {
+
+        turnTotalTextView.setText("" + pigGameState.getRunTotal());
+        messageTextView.setText("" + pigGameState.getMsg());
+
+        if(pigGameState.getTurnID() == 0) {
             dieImageButton.setBackgroundColor(Color.RED);
+            switch (pigGameState.getCurrVal()) {
+                case 1:
+                    dieImageButton.setImageResource(R.drawable.face1);
+                    break;
+                case 2:
+                    dieImageButton.setImageResource(R.drawable.face2);
+                    break;
+                case 3:
+                    dieImageButton.setImageResource(R.drawable.face3);
+                    break;
+                case 4:
+                    dieImageButton.setImageResource(R.drawable.face4);
+                    break;
+                case 5:
+                    dieImageButton.setImageResource(R.drawable.face5);
+                    break;
+                default:
+                    dieImageButton.setImageResource(R.drawable.face6);
+                    break;
+            }
+
+
+            }
+        else {
+            dieImageButton.setBackgroundColor(Color.GRAY);
+
         }
+
+
     }//receiveInfo
 
     /**
@@ -104,15 +121,13 @@ public class PigHumanPlayer extends GameHumanPlayer implements OnClickListener {
      * 		the button that was clicked
      */
     public void onClick(View button) {
-        //TODO  You will implement this method to send appropriate action objects to the game
-        if(button.getId() == R.id.holdButton) {
-            PigHoldAction hold = new PigHoldAction(this);
-            game.sendAction(hold);
+        if(button instanceof ImageButton){ //roll
+            game.sendAction(new PigRollAction(this));
+        } else if (button instanceof Button) { //hold
+            game.sendAction(new PigHoldAction(this));
         }
-        else if (button.getId() == R.id.dieButton) {
-            PigRollAction roll = new PigRollAction(this);
-            game.sendAction(roll);
-        }
+
+
     }// onClick
 
     /**
@@ -144,4 +159,7 @@ public class PigHumanPlayer extends GameHumanPlayer implements OnClickListener {
 
     }//setAsGui
 
+    public void setMessageTextView(String text){
+        messageTextView.setText("" + text);
+    }
 }// class PigHumanPlayer

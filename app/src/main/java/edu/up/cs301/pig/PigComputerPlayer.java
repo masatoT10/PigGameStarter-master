@@ -14,7 +14,7 @@ import edu.up.cs301.game.util.Tickable;
  * @version August 2015
  */
 public class PigComputerPlayer extends GameComputerPlayer {
-
+    Random rand = new Random();
     /**
      * ctor does nothing extra
      */
@@ -30,21 +30,18 @@ public class PigComputerPlayer extends GameComputerPlayer {
      */
     @Override
     protected void receiveInfo(GameInfo info) {
-        // TODO  You will implement this method
-        PigGameState pgs = (PigGameState) info;
-        PigGameState pigGameState = new PigGameState(pgs);
-        Random ran = new Random();
-        boolean ranB = ran.nextBoolean();
+        PigGameState pigGameState = (PigGameState)info;
 
-        if (pgs.getId() == 1) {
-            if (ranB == true ) {
-                PigHoldAction hold = new PigHoldAction(this);
-                game.sendAction(hold);
-            }
-            else {
-                PigRollAction roll = new PigRollAction(this);
-                game.sendAction(roll);
-            }
+        if(pigGameState.getTurnID() != playerNum){
+            return;
+        }
+
+        sleep(1000);
+
+        if(rand.nextBoolean()){
+            game.sendAction(new PigHoldAction(this));
+        } else {
+            game.sendAction(new PigRollAction(this));
         }
     }//receiveInfo
 
