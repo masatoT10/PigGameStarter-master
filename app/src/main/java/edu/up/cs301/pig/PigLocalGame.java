@@ -36,7 +36,7 @@ public class PigLocalGame extends LocalGame {
     @Override
     protected boolean canMove(int playerIdx) {
         //TODO  You will implement this
-        if(pigGameState.getId() == playerIdx) {
+        if(playerIdx == pigGameState.getId()) {
             return true;
         }
         else { return false;}
@@ -66,10 +66,12 @@ public class PigLocalGame extends LocalGame {
             return true;
         }
         if (action instanceof PigRollAction) {
-            pigGameState.setCurrentV(random.nextInt(5)+1);
+            pigGameState.setCurrentV(random.nextInt(6)+1);
             if (pigGameState.getCurrentV() == 1) {
+                pigGameState.setMsg(""+playerNames[pigGameState.getId()]+ " lost all their points : (")
                 pigGameState.setCurrentT(0);
                changePlayer();
+                pigGameState.setCurrentT(0);
             }
             else {
                 pigGameState.setId(pigGameState.getCurrentV() + pigGameState.getCurrentT());
@@ -99,6 +101,7 @@ public class PigLocalGame extends LocalGame {
     protected void sendUpdatedStateTo(GamePlayer p) {
         //TODO  You will implement this method
         PigGameState pgs = new PigGameState();
+
         p.sendInfo(pgs);
     }//sendUpdatedSate
 
